@@ -1,0 +1,170 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">招聘中心信息修改</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">职位名</div>
+					<input type="text" class="admin_ui_input tmp" placeholder="请输入职位名">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">职责（不要使用英文逗号“,”下同）<div class="addInput" id="addInput_duty" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-plus-square-o"></i></div></div>
+					<input type="text" class="admin_ui_input tmp input_duty" placeholder="请输入职责">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">要求<div class="addInput" id="addInput_requirement" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-plus-square-o"></i></div></div>
+					<input type="text" class="admin_ui_input tmp input_requirement" placeholder="请输入要求">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">地点<div class="addInput" id="addInput_place" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-plus-square-o"></i></div></div>
+					<input type="text" class="admin_ui_input tmp input_place" placeholder="请输入地点" value="杭州">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">邮箱</div>
+					<input type="text" class="admin_ui_input tmp" placeholder="请输入邮箱" value="hr@cdcapital.net">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<a href="#/recruit.html" class="admin_ui_button admin_ui_button_white" data-urlBack>返回</a>
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+
+<script>
+var position,email;
+var duty=[];
+var requirement=[];
+var place=[];
+var id_array=window.location.hash;
+var id_get=id_array.split("=")[1];
+var add = 1;
+if(!(typeof(id_get) == "undefined")){
+	add = 0;
+	$.when(getRecruitment()).done(function(data){
+		var datalist = data.list;	
+		for (var i = 0; i < datalist.length; i++) {
+			if(datalist[i].id==id_get){
+				$(".tmp")[0].value = datalist[i].position;
+				$(".tmp")[4].value = datalist[i].email;
+				var duty_get = datalist[i].duty;
+				var requirement_get = datalist[i].requirement;
+				var place_get = datalist[i].place;
+
+				duty_count = duty_get.length-1;
+				$(".tmp")[1].value = duty_get[0];
+				console.log(duty_get)
+				for (var j = 1; j < duty_get.length; j++) {
+					var input = document.createElement('input');
+					input.setAttribute('type','text');
+					input.setAttribute('class','admin_ui_input input_duty');
+					$("#addInput_duty").parent().parent().append(input);
+					$(".input_duty")[j].value = duty_get[j];
+				}
+				
+				requirement_count = requirement_get.length-1;
+				$(".tmp")[2].value = requirement_get[0];
+				for (var j = 1; j < requirement_get.length; j++) {
+					var input = document.createElement('input');
+					input.setAttribute('type','text');
+					input.setAttribute('class','admin_ui_input input_requirement');
+					$("#addInput_requirement").parent().parent().append(input);
+					$(".input_requirement")[j].value = requirement_get[j];
+				}
+				place_count = place_get.length-1;
+				$(".tmp")[3].value = place_get[0];
+				for (var j = 1; j < place_get.length; j++) {
+					var input = document.createElement('input');
+					input.setAttribute('type','text');
+					input.setAttribute('class','admin_ui_input input_place');
+					$("#addInput_place").parent().parent().append(input);
+					$(".input_place")[j].value = place_get[j];
+				}
+			}
+		}
+	});
+}
+
+var duty_count = 0;
+var requirement_count = 0;
+var place_count = 0;
+$("#addInput_duty").on("click",function(){
+	duty_count++;
+	var input = document.createElement('input');
+	input.setAttribute('type','text');
+	input.setAttribute('class','admin_ui_input input_duty');
+	$("#addInput_duty").parent().parent().append(input);
+})
+$("#addInput_requirement").on("click",function(){
+	requirement_count++;
+	var input = document.createElement('input');
+	input.setAttribute('type','text');
+	input.setAttribute('class','admin_ui_input input_requirement');	
+	$("#addInput_requirement").parent().parent().append(input);
+})
+$("#addInput_place").on("click",function(){
+	place_count++;
+	var input = document.createElement('input');
+	input.setAttribute('type','text');
+	input.setAttribute('class','admin_ui_input input_place');
+	$("#addInput_place").parent().parent().append(input);
+})
+
+$(".admin_ui_button_green").on("click",function(){
+	position = $(".tmp")[0].value;
+	email = $(".tmp")[4].value;
+	
+	var duty_current = 0;
+	for (var i = 0; i < duty_count+1; i++) {
+		if($(".input_duty")[i].value!=""){
+	 		duty[duty_current] =  $(".input_duty")[i].value;
+	 		duty_current++;
+	 	}
+	 }
+	var requirement_current = 0;
+	for (var i = 0; i < requirement_count+1; i++) {
+		if($(".input_requirement")[i].value!=""){
+	 		requirement[requirement_current] =  $(".input_requirement")[i].value;
+	 		requirement_current++;
+	 	}
+	 }
+	var place_current = 0;
+	for (var i = 0; i < place_count+1; i++) {
+		if($(".input_place")[i].value!=""){
+	 		place[place_current] =  $(".input_place")[i].value;
+	 		place_current++;
+	 	}
+	 }
+
+	if(add){
+		$.when(addRecruitment(position,duty,requirement,place,email)).done(function(data){
+			if(data.state==0){
+				alert("添加成功");
+	  			window.location.href="#/recruit.html"; 
+	  		}
+	  		else{
+	  			alert(data.detail);
+	  		}
+		});
+	}
+	else{
+		$.when(editCrucitement(id_get,position,duty,requirement,place,email)).done(function(data){
+			if(data.state==0){
+				alert("修改成功");
+	  			window.location.href="#/recruit.html"; 
+	  		}
+	  		else{
+	  			alert(data.detail);
+	  		}
+		});
+	}
+})
+</script>

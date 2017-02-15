@@ -1,0 +1,106 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">联系创道信息修改</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">热线</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入热线">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">邮箱</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入邮箱">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">传真</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入传真">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">新浪微博地址</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入新浪微博地址">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">新浪微博二维码</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入二维码图片地址">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">微信公众号名称</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入微信公众号名称">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">微信公众号二维码</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入二维码图片地址">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+
+<script>
+var datalist;
+var datalist_revised = [];
+$.when(getContactus()).done(function(data){
+	datalist = data.list;	
+	var hotline,email,fax,weibo,weixin;
+	var weiboimg=[];
+	var weixinimg=[];
+	for (var i = 0; i < datalist.length; i++) {
+		if(datalist[i].name=="hotline"){
+			hotline = datalist[i].value;
+		}
+		if(datalist[i].name=="email"){
+			email = datalist[i].value;
+		}
+		if(datalist[i].name=="fax"){
+			fax = datalist[i].value;
+		}
+		if(datalist[i].name=="weibo"){
+			weibo = datalist[i].value;
+			weiboimg[0] = datalist[i].img[0];
+		}
+		if(datalist[i].name=="weixin"){
+			weixin = datalist[i].value;
+			weixinimg[0] = datalist[i].img[0];
+		}
+	}
+	$(".admin_ui_input")[0].value = hotline;
+	$(".admin_ui_input")[1].value = fax;
+	$(".admin_ui_input")[2].value = email;
+	$(".admin_ui_input")[3].value = weibo;
+	$(".admin_ui_input")[4].value = weiboimg[0];
+	$(".admin_ui_input")[5].value = weixin;
+	$(".admin_ui_input")[6].value = weixinimg[0];
+});
+
+var add = 0;
+$(".admin_ui_button_green").on("click",function(){
+	for (var i = 0; i < 6; i++) {
+		datalist_revised[i] = $(".admin_ui_input")[i].value;
+	}	
+	for (var i = 0; i < 3; i++) {
+		console.log(datalist[i])
+		$.when(editIntroduction(datalist[i].id,datalist[i].name,datalist_revised[i],datalist[i].description,datalist[i].img[0])).done(function(data){
+			add++;
+		});
+	}
+	$.when(editIntroduction(datalist[3].id,datalist[3].name,datalist_revised[3],datalist[3].description,datalist_revised[4])).done(function(data){
+		add++;
+		$.when(editIntroduction(datalist[4].id,datalist[4].name,datalist_revised[5],datalist[4].description,datalist_revised[6])).done(function(data){
+			add++;
+			if(add == 5){
+				alert("修改成功");
+			}
+		});
+	});
+})
+</script>

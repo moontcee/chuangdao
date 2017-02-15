@@ -1,0 +1,336 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">行业新闻详情编辑</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">题目</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入题目">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">摘要</div>
+					<textarea type="text" class="admin_ui_input" placeholder="请输入摘要" style="height: 100px"></textarea>
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">时间</div>
+					<input class="inputDate" id="inputDate" style="border: 1px solid #ddd; padding: 6px 4px; height: 30px;" type="text">
+				</div>
+
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">配图<div class="image_select" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-folder-open-o"></i></div></div>
+					<input type="text" class="admin_ui_input" placeholder="请输入图片地址">
+				</div>
+			</div>
+			<div class="admin_ui_border admin_ui_cont">
+				正文
+				<div class="admin_ui_form_field">
+					<textarea id="tinymce"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="image_blocks">
+		<table>
+			<td v-for="(img,index) in imageList" class="image_toSelect"
+			v-show="index >= (pageIndex-1)*16 && index < pageIndex*16">
+				<img :src="baseUrl+img" @click="getImgUrl(index)">
+			</td>
+		</table>
+		<div class="admin_ui_pagination">
+			<div class="M-box"></div>
+		</div>
+	</div>
+	<div class="image_bottons">
+		<div class="admin_ui_button admin_ui_button_white_img image_cancel" data-urlBack>
+			取消
+		</div>
+		<div class="admin_ui_button admin_ui_button_green_img image_add">
+			添加
+		</div>
+		<div class="admin_ui_button admin_ui_button_white_img image_upload">
+			<input id="imgUpload" type="file" multiple style="opacity: 0; width: 100%; height: 100%; position: absolute; left: 0px;">
+			上传新图片
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<a href="#/news_industrynews.html" class="admin_ui_button admin_ui_button_white" data-urlBack>返回</a>
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+<script>
+var editor =  new tinymce.Editor('tinymce', {
+	statusbar: false,
+    height: 500,
+	theme: 'modern',
+	language: 'zh_CN',
+	content_style: "body{font-family: sans-serif}",
+	plugins: [
+	    'lineheight advlist autolink lists link image charmap print preview hr anchor pagebreak',
+	    'searchreplace wordcount visualblocks visualchars code fullscreen',
+	    'insertdatetime media nonbreaking save table contextmenu directionality',
+	    'emoticons template powerpaste textcolor colorpicker textpattern imagetools'
+	],
+	toolbar1: 'insertfile undo redo | fontselect | fontsizeselect | styleselect | lineheightselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+	toolbar2: 'link image media | forecolor backcolor emoticons print preview', //| example
+	font_formats: '宋体=SimSun,STSong;黑体=SimHei,STHeiti;微软雅黑=Microsoft YaHei;楷体=KaiTi,STKaiti;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n',
+	lineheight_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 60pt 72pt',
+	fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 60pt 72pt',
+	init_instance_callback: function (editor) {
+		editor.on('keydown', function (e) {
+			// tab键缩紧2格
+	    	if(e.keyCode == 9){
+	    		e.preventDefault();
+	    		this.execCommand("mceInsertContent", false, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+	    	}
+	    });
+	    editor.on('keyup', function (e) {
+	    	if(e.keyCode == 9){
+	    		 
+	    	}
+	    });
+	},
+	file_picker_callback: function(callback, value, meta) {
+        // Provide file and text for the link dialog
+        if (meta.filetype == 'file') {
+            // callback('mypage.html', {text: 'My text'});
+        }
+        // Provide image and alt text for the image dialog
+        if (meta.filetype == 'image') {
+        	var input = document.createElement("input")
+		    input.type = "file"
+		    // input.accept="image/*"
+		    // input.mutiple = "mutiple"
+		    input.click()
+		    input.onchange = function(e){
+		        var file = e.target.files[0]
+		        var formData = new FormData()
+		        uploadImg(file).done(function(data){
+		          	if(data.state == 0){
+		            	callback(data.detail)
+		        	}
+			    }).always(function(data){
+			    })
+		    }
+        }
+        // Provide alternative source and posted for the media dialog
+        if (meta.filetype == 'media') {
+            // callback('movie.mp4', {source2: 'alt.ogg', poster: 'image.jpg'});
+        }
+    },
+	image_advtab: true,
+	relative_url: false,
+	powerpaste_word_import: 'propmt',// propmt, merge, clear
+    powerpaste_html_import: 'propmt',// propmt, merge, clear
+    powerpaste_allow_local_images: true,
+	paste_data_images: true,
+	images_upload_handler: function (blobInfo, success, failure) {
+      uploadImg(blobInfo.blob(),"testName",Math.random() - 0 + ".png").done(function(data){
+      	if(data.state == 0){
+      		success(data.detail)
+      	}
+        else{
+        	alert(data.detail);
+        }
+      })
+    },
+}, tinymce.EditorManager);
+
+
+editor.render();
+// 获得编辑器中内容
+function getEditorContent(){
+	return editor.getContent();
+}
+// 设置编辑器内容
+function setEditorContent(html){
+	editor.setContent(html);
+}
+// 往编辑器中插入内容
+function insertContentToEditor(html){
+	editor.insertContent(html);
+}
+// 设置 "design", "code" or "readonly"
+function setEditorMode(mode){
+	editor.setMode(mode);
+}
+
+var input_value;
+$(function(){
+	var date_now = new Date();
+	var year_now = date_now.getFullYear();
+	var month_now = date_now.getMonth()+1;
+	var day_now = date_now.getDate();
+	var date = month_now+"-"+day_now+"-"+year_now;
+	document.getElementById("inputDate").value = date;
+
+	$('#inputDate').DatePicker({
+		format:'m-d-Y',
+		date: '2008-07-31',
+		current: '2008-07-31',
+		calendars: 1,
+		starts: 1,
+		onBeforeShow: function(){
+			$('#inputDate').DatePickerSetDate($('#inputDate').val(), true);
+		},
+		onChange: function(formated, dates){
+			$('#inputDate').val(formated);
+			if ($('#closeOnSelect input').attr('checked')) {
+				$('#inputDate').DatePickerHide();
+			}
+			input_value = document.getElementById("inputDate").value;
+			console.log(input_value)
+		}
+	});
+})
+
+var title,summary,year,month,day,img,text;
+var id_array=window.location.hash;
+var id_get=id_array.split("=")[1];
+var add = 1;
+
+if(!(typeof(id_get) == "undefined")){
+	add = 0;
+	$.when(getPro_content(id_get)).done(function(data){
+		$(".admin_ui_input")[0].value = data.title;
+		$(".admin_ui_input")[1].value = data.summary;
+		$(".admin_ui_input")[2].value = data.img[0];
+		year = stamp2time(data.time).split("-")[0];
+		month = stamp2time(data.time).split("-")[1];
+		day = stamp2time(data.time).split("-")[2];
+		var date_this = month+"-"+day+"-"+year;
+		document.getElementById("inputDate").value = date_this;
+		text = data.text;
+		setTimeout(function(){
+			setEditorContent(text);
+			},1000);	
+	});
+}
+
+$(".admin_ui_button_green").on("click",function(){
+	title = $(".admin_ui_input")[0].value;
+	summary = $(".admin_ui_input")[1].value;
+	img = $(".admin_ui_input")[2].value;
+	date = document.getElementById("inputDate").value;
+	year = date.split("-")[2];
+	month = date.split("-")[0];
+	day = date.split("-")[1];
+	text = getEditorContent();
+	var mydate = new Date();
+	mydate.setFullYear(year,month-1,day);
+	if(add){
+		$.when(addArticle(mydate,title,summary,text,img,"INDUSTRY_NEWS","")).done(function(data){
+			if(data.state==0){
+				alert("添加成功");
+	  			window.location.href="#/news_industrynews.html"; 
+	  		}
+	  		else{
+	  			alert(data.detail);
+	  		}
+		});
+	}
+	else{
+		$.when(editArticle(id_get,mydate,title,summary,text,img,"INDUSTRY_NEWS","")).done(function(data){
+			if(data.state==0){
+				alert("修改成功");
+	  			window.location.href="#/news_industrynews.html"; 
+	  		}
+	  		else{
+	  			alert(data.detail);
+	  		}
+		});
+	}
+});
+
+var vm = new Tvm({
+	el: '.image_blocks',
+	data:{
+		imageList:[],
+		baseUrl: "http://chuangdao.moovi-tech.com",
+		imgUrl:"",
+	},
+	methods: {
+		getImgUrl:function(index){
+			var self = this;
+			$(".image_toSelect img").css("border","1px solid #ccc");
+			$(".image_toSelect img").eq(index).css("border","2px solid #f34541");
+			self.imgUrl = $(".image_toSelect img").eq(index).attr("src").split("com")[1];
+		},
+		refreshTable: function(){
+			var self = this;
+			$('.M-box').pagination({
+				totalData: self.imageList.length,
+			    showData: 16,
+			    current: self.pageIndex,
+			    count: 3,
+			    jump: true,
+				coping: true,
+				prevContent:'<i class="fa fa-angle-left"></i>',		//上一页内容
+				nextContent:'<i class="fa fa-angle-right"></i>',		//下一页内容
+			    callback:function(index){
+			        self.pageIndex = index;
+			    }
+			});
+		},
+	},
+	created:function(){
+		var self = this;
+		$.when(getImg()).done(function(data){
+			self.imageList=data.list;
+			self.refreshTable();
+		});
+	},
+	mounted:function(){
+		var self = this;
+		$(".admin_ui_button_green_img").on("click",function(){
+			$(".admin_ui_input")[2].value = self.imgUrl;
+			$(".image_blocks").hide();
+			$(".image_bottons").hide();
+		})
+		$("#imgUpload").on("change",function(e){
+			var uploads = e.target.files.length;
+			var filter_length = self.imageList.length;
+			for (var i = 0; i < e.target.files.length; i++) {
+				var img = e.target.files[i];
+				var img_name = "testName";
+				$.when(uploadImg(img,img_name)).done(function(data){
+					var img_this = img;
+					if(data.state==0){
+						uploads--;
+						if(uploads==0){
+							alert("上传成功");
+							$.when(getImg()).done(function(data){
+								self.imageList=data.list;
+								self.refreshTable();
+							});
+						}			
+					}
+					else if(data.state==1){
+						alert("文件名为 "+img_this.name+" 的图片已存在");
+					}
+					else{
+						alert("上传失败，请重试");
+					}
+				});
+			}
+		})
+	}
+});
+$(".image_select").on("click",function(){
+	$(".image_blocks").show();
+	$(".image_bottons").show();
+	
+})
+
+$(".image_cancel").on("click",function(){
+	$(".image_blocks").hide();
+	$(".image_bottons").hide();
+})
+
+</script>

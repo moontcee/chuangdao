@@ -1,0 +1,136 @@
+<div class="admin_content_innerBox" id="admin_content_innerBox">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-table fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">找到我们</span>
+		</div>	
+		<div class="admin_ui_cont">			
+			<div class="admin_ui_search">
+				<a href="#/contact_findus_detail.html"  class="admin_ui_button admin_ui_button_white button_" style="display: inline-block!important; min-width: 120px; height: 30px; line-height: 28px; padding: 0;">新增</a>
+				<div style="float:right;height:30px;">
+					<input v-model="keyword" @keyup.13="search" type="text" style="width:250px;height:30px;border:1px solid #ccc;margin-left:10px;" class="ui-input" id="search" placeholder="请输入关键词进行搜索">
+					<i @click="search" class="fa fa-search" style="margin-left:-30px;cursor:pointer;width:20px;height:20px;" id="searching"></i>
+				</div>
+			</div>
+			<table class="admin_ui_table">
+				<tbody class="admin_ui_table_hoverEffect">
+					<thead>
+					<tr>
+						<th>区域</th>
+						<th>地址</th>
+						<th>电话</th>	
+						<th>手机</th>
+						<th>邮编</th>
+						<th width="20%">配图</th>
+						<th>操作</th>				
+					</tr>
+				</thead>
+				<tbody class="admin_ui_table_hoverEffect">
+					<tr v-for="(user,index) in usersDataSource_filter" v-show="index >= (pageIndex-1)*10 && index < pageIndex*10" style="border: 1px solid #ddd;">
+						<td>{{user.type}}</td>
+						<td>{{user.address.value}}</td>
+						<td>{{user.tel.value}}</td>
+						<td>{{user.cellphone.value}}</td>
+						<td>{{user.zipcode.value}}</td>
+						<td style="text-align: center; height: 200px;" :style="{backgroundImage: 'url('+baseUrl+user.img.value+')',backgroundSize:'contain',backgroundRepeat:'no-repeat',backgroundPosition:'center'}"></td>
+						<td class="admin_ui_table_action">
+							<a :href="getUrl(user.address.id)" class="iconButton checkIcon">
+								<i class="fa fa-eye"></i>
+								修改
+							</a>						
+							<div class="iconButton removeIcon" @click="deleteUserButton(user.address.id,user.tel.id,user.cellphone.id,user.zipcode.id,user.img.id)">
+								<i class="fa fa-remove"></i>
+								删除
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="admin_ui_pagination">
+				<div class="M-box"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var vm = new Tvm({
+	el: '#admin_content_innerBox',
+	data:{
+		keyword: "",
+		usersDataSource: [],
+		usersDataSource_filter:[],
+		baseUrl: "http://chuangdao.moovi-tech.com",	
+		pageIndex: 1,
+	},
+	methods: {
+		deleteUserButton: function(id1,id2,id3,id4,id5){
+			var self = this;
+			var msg = "真的要删除吗？"
+			if(confirm(msg)){
+				$.when(deleteSetting(id1),deleteSetting(id2),deleteSetting(id3),deleteSetting(id4),deleteSetting(id5)).done(function(data){
+					alert("删除成功");
+					window.location.reload();
+				});
+			}
+			else{
+			}
+		},
+		getUrl:function(val){
+			return '#/contact_findus_detail.html?id='+val;
+		},
+		search: function(){
+			var self = this;
+			self.usersDataSource_filter = [];
+			for(index in self.usersDataSource){
+				var _user = self.usersDataSource[index];
+				if(self.isContainKeyword([_user.type,_user.address.value,_user.tel.value,_user.cellphone.value,_user.zipcode.value],self.keyword)){
+					self.usersDataSource_filter.push(_user);
+				}
+			}
+			self.refreshTable();
+		},
+		isContainKeyword: function(arr,keyword){
+			for(index in arr){
+				if(typeof arr[index] == "undefined"){
+					arr[index]="";
+				}
+				if(typeof arr[index] != "string"){
+					arr[index] = arr[index]+"";
+				}
+				if(arr[index].search(keyword)>=0){
+					return true;
+				}
+			}
+			return false;
+		},
+		refreshTable: function(){
+			var self = this;
+			$('.M-box').pagination({
+				totalData: self.usersDataSource_filter.length,
+			    showData: 10,
+			    current: self.pageIndex,
+			    count: 3,
+			    jump: true,
+				coping: true,
+				prevContent:'<i class="fa fa-angle-left"></i>',		//上一页内容
+				nextContent:'<i class="fa fa-angle-right"></i>',		//下一页内容
+			    callback:function(index){
+			        self.pageIndex = index;
+			    }
+			});
+		},
+	},
+	created: function(){
+		var self = this;
+		$.when(getFindus()).done(function(data){
+			if(data.list.length==0){
+				$(".admin_ui_pagination").css("display","none");
+			}
+			self.usersDataSource = data.list;
+			self.usersDataSource_filter = self.usersDataSource;
+			self.refreshTable();
+		});
+	}
+});
+
+</script>

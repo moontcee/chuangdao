@@ -1,0 +1,143 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">公司简介</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<textarea id="tinymce"></textarea>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+<script>
+var editor =  new tinymce.Editor('tinymce', {
+	statusbar: false,
+    height: 500,
+	theme: 'modern',
+	language: 'zh_CN',
+	content_style: "body{font-family: sans-serif}",
+	plugins: [
+	    'lineheight advlist autolink lists link image charmap print preview hr anchor pagebreak',
+	    'searchreplace wordcount visualblocks visualchars code fullscreen',
+	    'insertdatetime media nonbreaking save table contextmenu directionality',
+	    'emoticons template powerpaste textcolor colorpicker textpattern imagetools'
+	],
+	toolbar1: 'insertfile undo redo | fontselect | fontsizeselect | styleselect | lineheightselect | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+	toolbar2: 'link image media | forecolor backcolor emoticons print preview', //| example
+	font_formats: '宋体=SimSun,STSong;黑体=SimHei,STHeiti;微软雅黑=Microsoft YaHei;楷体=KaiTi,STKaiti;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n',
+	lineheight_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 60pt 72pt',
+	fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 60pt 72pt',
+	init_instance_callback: function (editor) {
+		editor.on('keydown', function (e) {
+			// tab键缩紧2格
+	    	if(e.keyCode == 9){
+	    		e.preventDefault();
+	    		this.execCommand("mceInsertContent", false, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+	    	}
+	    });
+	    editor.on('keyup', function (e) {
+	    	if(e.keyCode == 9){ 
+	    	}
+	    });
+	},
+	file_picker_callback: function(callback, value, meta) {
+        // Provide file and text for the link dialog
+        if (meta.filetype == 'file') {
+            // callback('mypage.html', {text: 'My text'});
+        }
+        // Provide image and alt text for the image dialog
+        if (meta.filetype == 'image') {
+        	var input = document.createElement("input")
+		    input.type = "file"
+		    // input.accept="image/*"
+		    // input.mutiple = "mutiple"
+		    input.click()
+		    input.onchange = function(e){
+		        var file = e.target.files[0]
+		        var formData = new FormData()
+		        uploadImg(file).done(function(data){
+		          	if(data.state == 0){
+		            	callback(data.detail)
+		        	}
+			    }).always(function(data){
+			    })
+		    }
+        }
+        // Provide alternative source and posted for the media dialog
+        if (meta.filetype == 'media') {
+            // callback('movie.mp4', {source2: 'alt.ogg', poster: 'image.jpg'});
+        }
+    },
+	image_advtab: true,
+	relative_url: false,
+	powerpaste_word_import: 'propmt',// propmt, merge, clear
+    powerpaste_html_import: 'propmt',// propmt, merge, clear
+    powerpaste_allow_local_images: true,
+	paste_data_images: true,
+	images_upload_handler: function (blobInfo, success, failure) {
+      uploadImg(blobInfo.blob(),"testName",Math.random() - 0 + ".png").done(function(data){
+      	if(data.state == 0){
+      		success(data.detail)
+      	}
+        else{
+        	alert(data.detail);
+        }
+      })
+    },
+}, tinymce.EditorManager);
+
+editor.render();
+// 获得编辑器中内容
+function getEditorContent(){
+	return editor.getContent();
+}
+// 设置编辑器内容
+function setEditorContent(html){
+	editor.setContent(html);
+}
+// 往编辑器中插入内容
+function insertContentToEditor(html){
+	editor.insertContent(html);
+}
+// 设置 "design", "code" or "readonly"
+function setEditorMode(mode){
+	editor.setMode(mode);
+}
+var  img_count = 0;
+var id_this, name_this, value_this, description_this;
+var img_this=[];
+$.when(getIntroduction()).done(function(data){
+	var html = data.info.value;
+	id_this = data.info.id;
+	name_this = data.info.name;
+	description_this = data.info.description;
+	img_this[0] = data.info.img;	
+	setTimeout(function(){
+		setEditorContent(html);
+	},1000);
+	$(".admin_ui_button_green").on("click",function(){
+		value_this = getEditorContent();
+		$.when(editIntroduction(id_this, name_this, value_this, description_this, img_this)).done(function(data){
+			if(data.state){
+				alert(data.detail);
+			}
+			else{
+				alert("修改成功");
+				window.location.reload();
+			}
+		});
+	});
+});
+
+</script>

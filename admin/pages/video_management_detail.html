@@ -1,0 +1,207 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">视频封面编辑</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">封面图片<div class="image_select" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-folder-open-o"></i></div></div>
+					<input type="text" class="admin_ui_input" placeholder="请输入图片地址">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="image_blocks">
+		<table>
+			<td v-for="(img,index) in imageList" class="image_toSelect"
+			v-show="index >= (pageIndex-1)*16 && index < pageIndex*16">
+				<img :src="baseUrl+img" @click="getImgUrl(index)">
+			</td>
+		</table>
+		<div class="admin_ui_pagination">
+			<div class="M-box"></div>
+		</div>
+	</div>
+	<div class="image_bottons">
+		<div class="admin_ui_button admin_ui_button_white_img image_cancel" data-urlBack>
+			取消
+		</div>
+		<div class="admin_ui_button admin_ui_button_green_img image_add">
+			添加
+		</div>
+	</div>
+</div>
+
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<a href="#/video_management.html" class="admin_ui_button admin_ui_button_white" data-urlBack>返回</a>
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+<script>
+var editor =  new tinymce.Editor('tinymce', {
+	statusbar: false,
+    height: 500,
+	theme: 'modern',
+	language: 'zh_CN',
+	content_style: "body{font-family: sans-serif}",
+	plugins: [
+	    'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+	    'searchreplace wordcount visualblocks visualchars code fullscreen',
+	    'insertdatetime media nonbreaking save table contextmenu directionality',
+	    'emoticons template paste textcolor colorpicker textpattern imagetools'
+	],
+	toolbar1: 'insertfile undo redo | fontselect | fontsizeselect | styleselect | bold italic underline strikethrough superscript subscript | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent',
+	toolbar2: 'link image media | forecolor backcolor emoticons print preview', //| example
+	font_formats: '宋体=SimSun,STSong;黑体=SimHei,STHeiti;微软雅黑=Microsoft YaHei;楷体=KaiTi,STKaiti;Arial=arial,helvetica,sans-serif;Courier New=courier new,courier,monospace;AkrutiKndPadmini=Akpdmi-n',
+	fontsize_formats: '8pt 10pt 12pt 14pt 18pt 24pt 36pt 48pt 60pt 72pt',
+	init_instance_callback: function (editor) {
+		editor.on('keydown', function (e) {
+			// tab键缩紧2格
+	    	if(e.keyCode == 9){
+	    		e.preventDefault();
+	    		this.execCommand("mceInsertContent", false, "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+	    	}
+	    });
+	    editor.on('keyup', function (e) {
+	    	if(e.keyCode == 9){
+	    		 
+	    	}
+	    });
+	},
+
+	setup: function(ed) {
+      	ed.addButton('example', {
+         	title: 'My title',
+         	image: 'https://avatars0.githubusercontent.com/u/9668199?v=3&s=40',
+         	onclick: function() {
+            	ed.insertContent('Hello world!!');
+         	}
+      	});
+      	ed.addMenuItem('example2', {
+	        text: 'My menu item',
+	        context: 'tools',// 定义菜单被加入的位置： file\edit\insert\view\format\table\tools
+	        onclick: function() {
+	            ed.insertContent('Hello world!!');
+	        }
+        });
+    },
+	image_advtab: true,
+	image_upload: true,
+	image_upload_url: '/upload',
+	relative_url: false,
+	templates: [
+	    { title: 'Test template 1', content: 'Test 1' },
+	    { title: 'Test template 2', content: 'Test 2' }
+	],
+}, tinymce.EditorManager);
+
+editor.render();
+// 获得编辑器中内容
+function getEditorContent(){
+	return editor.getContent();
+}
+// 设置编辑器内容
+function setEditorContent(html){
+	editor.setContent(html);
+}
+// 往编辑器中插入内容
+function insertContentToEditor(html){
+	editor.insertContent(html);
+}
+// 设置 "design", "code" or "readonly"
+function setEditorMode(mode){
+	editor.setMode(mode);
+}
+function getBase64Image(img) {
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0, img.width, img.height);
+    var dataURL = canvas.toDataURL("image/png");
+    return dataURL;
+}
+var vm = new Tvm({
+	el: '.image_blocks',
+	data:{
+		imageList:[],
+		baseUrl: "http://chuangdao.moovi-tech.com",
+		imgUrl:"",
+	},
+	methods: {
+		getImgUrl:function(index){
+			var self = this;
+			$(".image_toSelect img").css("border","1px solid #ccc");
+			$(".image_toSelect img").eq(index).css("border","2px solid #f34541");
+			self.imgUrl = $(".image_toSelect img").eq(index).attr("src").split("com")[1];
+		},
+		refreshTable: function(){
+			var self = this;
+			$('.M-box').pagination({
+				totalData: self.imageList.length,
+			    showData: 16,
+			    current: self.pageIndex,
+			    count: 3,
+			    jump: true,
+				coping: true,
+				prevContent:'<i class="fa fa-angle-left"></i>',		//上一页内容
+				nextContent:'<i class="fa fa-angle-right"></i>',		//下一页内容
+			    callback:function(index){
+			        self.pageIndex = index;
+			    }
+			});
+		},
+	},
+	created:function(){
+		var self = this;
+		$.when(getImg()).done(function(data){
+			self.imageList=data.list;
+			self.refreshTable();
+		});
+	},
+	mounted:function(){
+		var self = this;
+		$(".admin_ui_button_green_img").on("click",function(){
+			$(".admin_ui_input")[0].value = self.imgUrl;
+			$(".image_blocks").hide();
+			$(".image_bottons").hide();
+		})
+	}
+});
+var id_array=window.location.hash;
+var id_get=id_array.split("=")[1];
+var url_get, img_get;
+if(id_get){
+	id_get=id_get.split("&")[0];
+	url_get=id_array.split("=")[2].split("&")[0];
+	img_get=id_array.split("=")[3];
+	$(".admin_ui_input")[0].value = img_get;
+}
+$(".admin_ui_button_green").on("click",function(){
+	img_get = $(".admin_ui_input")[0].value;
+	$.when(editVideo(id_get,url_get,img_get)).done(function(data){
+		alert("修改成功");
+		window.location.href="#/video_management.html"; 
+	});
+});
+
+$(".image_select").on("click",function(){
+	$(".image_blocks").show();
+	$(".image_bottons").show();
+	
+})
+
+$(".admin_ui_button_white_img").on("click",function(){
+	$(".image_blocks").hide();
+	$(".image_bottons").hide();
+})
+
+
+
+</script>

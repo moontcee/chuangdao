@@ -1,0 +1,121 @@
+<div class="admin_content_innerBox" id="admin_content_innerBox">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-table fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">注册用户信息</span>
+		</div>	
+		<div class="admin_ui_cont">
+			<div class="admin_ui_search">
+				<div class="inner">
+					<input class="admin_ui_input" type="text">
+					<i @click="search" class="fa fa-search"></i>
+				</div>
+			</div>
+			<table class="admin_ui_table">
+				<thead>
+					<tr>
+						<th>用户名</th>	
+						<th>操作</th>			
+					</tr>
+				</thead>
+				<tbody class="admin_ui_table_hoverEffect">
+					<tr v-for="(user,index) in usersDataSource_filter" v-show="index >= (pageIndex-1)*10 && index < pageIndex*10" style="border: 1px solid #ddd;">
+						<td>{{user.name}}</td>
+						<td class="admin_ui_table_action">
+							<a :href="getUrl(user.id,user.type)" class="iconButton checkIcon">
+								<i class="fa fa-eye"></i>
+								查看
+							</a>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="admin_ui_pagination">
+				<div class="M-box"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var vm = new Tvm({
+	el: '#admin_content_innerBox',
+	data:{
+		keyword: "",
+		usersDataSource: [],
+		usersDataSource_filter:[],
+		dataSource_sub: [],
+		baseUrl: "http://chuangdao.moovi-tech.com",
+		pageIndex: 1
+	},
+	methods: {
+		deleteUserButton: function(index){
+			var self = this;
+			var msg = "真的要删除吗？"
+			if(confirm(msg)){
+				$.when(deleteArticle(self.usersDataSource_filter[index].id)).done(function(data){
+					alert("删除成功");
+					window.location.reload();
+				});
+			}
+			else{
+			}
+		},
+		getUrl:function(val1,val2){
+			return '#/admin_user_detail.html?id='+val1+"&type="+val2;
+		},
+		search: function(){
+			var self = this;
+			self.usersDataSource_filter = [];
+			for(index in self.usersDataSource){
+				var _user = self.usersDataSource[index];
+				if(self.isContainKeyword([_user.id, stamp2time(_user.in_time), _user.userinfo.nick, _user.userinfo.nick.phone],self.keyword)){
+					self.usersDataSource_filter.push(_user);
+				}
+			}
+			self.refreshTable();
+		},
+		isContainKeyword: function(arr,keyword){
+			for(index in arr){
+				if(typeof arr[index] == "undefined"){
+					arr[index]="";
+				}
+				if(typeof arr[index] != "string"){
+					arr[index] = arr[index]+"";
+				}
+				if(arr[index].search(keyword)>=0){
+					return true;
+				}
+			}
+			return false;
+		},
+		refreshTable: function(){
+			var self = this;
+			$('.M-box').pagination({
+				totalData: self.usersDataSource_filter.length,
+			    showData: 10,
+			    current: self.pageIndex,
+			    count: 3,
+			    jump: true,
+				coping: true,
+				prevContent:'<i class="fa fa-angle-left"></i>',		//上一页内容
+				nextContent:'<i class="fa fa-angle-right"></i>',		//下一页内容
+			    callback:function(index){
+			        self.pageIndex = index;
+			    }
+			});
+		},
+	},
+	created: function(){
+		var self = this;
+		$.when(getUser()).done(function(data){
+			if(data.list.length==0){
+				$(".admin_ui_pagination").css("display","none");
+			}
+			self.usersDataSource = data.list;
+			self.usersDataSource_filter = self.usersDataSource;
+			self.refreshTable();
+		});
+	}
+});
+
+</script>

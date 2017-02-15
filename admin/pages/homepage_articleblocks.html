@@ -1,0 +1,141 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">首页文章块管理</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">文章①的标题</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入文章标题">
+					<div class="search_result_all">
+						<div class="search_result" v-for="(data,index) in text">
+							<p class="search_toSelect" onclick="selectTitle(this,0)">{{data.title}}</p>
+						</div>
+					</div>
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">文章②的标题</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入文章标题">
+					<div class="search_result_all">
+						<div class="search_result" v-for="(data,index) in text">
+							<p class="search_toSelect" onclick="selectTitle(this,1)">{{data.title}}</p>
+						</div>
+					</div>
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">文章③的标题</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入文章标题">
+					<div class="search_result_all">
+						<div class="search_result" v-for="(data,index) in text">
+							<p class="search_toSelect" onclick="selectTitle(this,2)">{{data.title}}</p>
+						</div>
+					</div>
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">文章④的标题</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入文章标题">
+					<div class="search_result_all">
+						<div class="search_result" v-for="(data,index) in text">
+							<p class="search_toSelect" onclick="selectTitle(this,3)">{{data.title}}</p>
+						</div>
+					</div>
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">文章⑤的标题</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入文章标题">
+					<div class="search_result_all">
+						<div class="search_result" v-for="(data,index) in text">
+							<p class="search_toSelect" onclick="selectTitle(this,4)">{{data.title}}</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+
+<script>
+function selectTitle(value,index){
+	$(".admin_ui_input")[index].value = $(value).html();	
+}
+var datalist;
+var idlist=[];
+$.when(getArticleSquare()).done(function(data){
+	datalist = data.list;	
+	var hotline,email,fax,weibo,weiboimg,weixin,weixinimg;
+	for (var i = 0; i < datalist.length; i++) {
+		$(".admin_ui_input")[i].value = datalist[i];
+	}
+});
+
+var edit = 1;
+$(".admin_ui_button_green").on("click",function(){
+	for (var i = 0; i < 5; i++) {
+		idlist[i] = $(".admin_ui_input")[i].value;
+		if(!idlist[i]){
+			edit = 0;
+			alert("请输入文章"+(i+1)+"的标题。");
+		}
+	}
+	if(edit){
+		$.when(editArticleSquare(idlist)).done(function(data){
+			if(data.state==0){
+				alert("修改成功");
+  				//window.location.reload();
+			}
+			else{
+				alert(data.detail);
+			}
+		});	
+	}
+})
+var vm = new Tvm({
+	el: '.admin_ui_border',
+	data:{
+		text:"",
+		baseUrl: "http://chuangdao.moovi-tech.com",
+		timeout:"",
+	},
+	methods: {
+		search: function(keyword){
+			var self = this;
+			self.timeout && clearTimeout(self.timeout);
+			self.timeout = setTimeout(function() {
+				$.when(searchArticle(keyword)).done(function(data){
+					self.text = data.list
+					// for (var i = 0; i < data.list.length; i++) {
+					// self.text[i] = data.list[i].title;				
+					// }	
+				})
+			},500);
+		},
+	},
+	created: function(){
+		var self = this;
+		$(".search_result_all").css("display","none");
+	},
+	mounted: function(){
+		var self = this;
+		$(".admin_ui_input").on("input",function(){
+			var keyword = this.value;	
+			self.search(keyword);
+			$(this).next().css("display","block");	
+		})
+		$("body").on("click",function(){
+			$(".search_result_all").css("display","none");
+			self.text=[];
+		})
+	},
+})
+</script>
+
+

@@ -1,0 +1,158 @@
+<div class="admin_content_innerBox" id="admin_content_innerBox">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-table fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">图片管理</span>
+		</div>	
+		<div class="admin_ui_cont">
+			<div class="admin_ui_search">
+				<div style="float:left;height:30px;">
+					<div class="admin_ui_button admin_ui_button_white button_" style="display: inline-block!important; min-width: 120px; height: 30px; line-height: 28px; padding: 0; position: relative;"><span style="position: absolute;left: 0px; width: 100%; height: 100%;text-align: center;">上传图片</span><input id="imgUpload" type="file" multiple style="opacity: 0; width: 100%; height: 100%; position: absolute; left: 0px;"></div>
+				</div>
+				<div style="float:right;height:30px;">
+					<input v-model="keyword" @keyup.13="search" type="text" style="width:250px;height:30px;border:1px solid #ccc;margin-left:10px;" class="ui-input" id="search" placeholder="请输入关键词进行搜索">
+					<i @click="search" class="fa fa-search" style="margin-left:-30px;cursor:pointer;width:20px;height:20px;" id="searching"></i>
+				</div>	
+			</div>
+			<table class="admin_ui_table">
+				<thead>
+					<tr>
+						<th>图片</th>
+						<th>图片地址</th>	
+						<th width="100px">删除</th>	
+					</tr>
+				</thead>
+				<tbody class="admin_ui_table_hoverEffect">
+					<tr v-for="(data,index) in usersDataSource_filter"  v-show="index >= (pageIndex-1)*10 && index < pageIndex*10" height="200px" style="border: 1px solid #ddd;">			
+						<td style="text-align: center; height: 200px;" :style="{backgroundImage: 'url('+baseUrl+data+')',backgroundSize:'contain',backgroundRepeat:'no-repeat',backgroundPosition:'center'}"></td>
+
+						<td>{{data}}</td> 
+						<td class="admin_ui_table_action">
+							<div class="iconButton removeIcon" @click="deleteUserButton(index)">
+								<i class="fa fa-remove"></i>
+								删除
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="admin_ui_pagination">
+				<div class="M-box"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var vm = new Tvm({
+	el: '#admin_content_innerBox',
+	data:{
+		keyword: "",
+		usersDataSource: [],
+		usersDataSource_filter:[],
+		dataSource_sub: [],
+		baseUrl: "http://www.cdcapital.net",
+		pageIndex: 1,
+	},
+	methods: {
+		search: function(){
+			var self = this;
+			self.usersDataSource_filter = [];
+			for(index in self.usersDataSource){
+				var _user = self.usersDataSource[index];
+				if(self.isContainKeyword([_user],self.keyword)){
+					self.usersDataSource_filter.push(_user);
+				}
+			}
+			self.refreshTable();
+		},
+		isContainKeyword: function(arr,keyword){
+			for(index in arr){
+				if(typeof arr[index] == "undefined"){
+					arr[index]="";
+				}
+				if(typeof arr[index] != "string"){
+					arr[index] = arr[index]+"";
+				}
+				if(arr[index].search(keyword)>=0){
+					return true;
+				}
+			}
+			return false;
+		},
+		refreshTable: function(){
+			var self = this;
+			$('.M-box').pagination({
+				totalData: self.usersDataSource_filter.length,
+			    showData: 10,
+			    current: self.pageIndex,
+			    count: 3,
+			    jump: true,
+				coping: true,
+				prevContent:'<i class="fa fa-angle-left"></i>',		//上一页内容
+				nextContent:'<i class="fa fa-angle-right"></i>',		//下一页内容
+			    callback:function(index){
+			        self.pageIndex = index;
+			    }
+			});
+		},
+		deleteUserButton: function(index){
+			var self = this;
+			var msg = "真的要删除吗？"
+			if(confirm(msg)){
+				$.when(deleteImg(self.usersDataSource_filter[index],1)).done(function(data){
+				alert("删除成功");
+				$.when(getImg()).done(function(data){
+					self.usersDataSource = data.list;	
+					self.usersDataSource_filter = self.usersDataSource;
+					self.refreshTable();
+				});
+			});
+			}
+			else{
+
+			}
+		},
+	},
+	created: function(){
+		var self = this;
+		$.when(getImg()).done(function(data){
+			self.usersDataSource = data.list;	
+			self.usersDataSource_filter = self.usersDataSource;
+			self.refreshTable();
+		});
+	},
+	mounted: function(){
+		var self = this;
+		$("#imgUpload").on("change",function(e){
+			var uploads = e.target.files.length;
+			var filter_length = self.usersDataSource_filter.length;
+			for (var i = 0; i < e.target.files.length; i++) {
+				var img = e.target.files[i];
+				var img_name = "testName";
+				$.when(uploadImg(img,img_name)).done(function(data){
+					var img_this = img;
+					if(data.state==0){
+						uploads--;
+						if(uploads==0){
+							alert("上传成功");
+							$.when(getImg()).done(function(data){
+								self.usersDataSource = data.list;	
+								self.usersDataSource_filter = self.usersDataSource;
+								self.refreshTable();
+							});
+						}			
+					}
+					else if(data.state==1){
+						alert("文件名为 "+img_this.name+" 的图片已存在");
+					}
+					else{
+						alert("上传失败，请重试");
+					}
+				});
+			}
+			
+		})
+	},
+
+});
+</script>

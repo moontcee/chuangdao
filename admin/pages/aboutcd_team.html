@@ -1,0 +1,156 @@
+<div class="admin_content_innerBox" id="admin_content_innerBox">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-table fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">管理团队</span>
+		</div>	
+		<div class="admin_ui_cont">
+			<div class="admin_ui_search">
+				<div style="float:left;height:30px;">
+					<a href="#/aboutcd_team_detail.html"  class="admin_ui_button admin_ui_button_white button_" style="display: inline-block!important; min-width: 120px; height: 30px; line-height: 28px; padding: 0;">新增</a>
+				</div>
+				<div style="float:right;height:30px;">
+					<input v-model="keyword" @keyup.13="search" type="text" style="width:250px;height:30px;border:1px solid #ccc;margin-left:10px;" class="ui-input" id="search" placeholder="请输入关键词进行搜索">
+					<i @click="search" class="fa fa-search" style="margin-left:-30px;cursor:pointer;width:20px;height:20px;" id="searching"></i>
+				</div>
+			</div>
+			<table class="admin_ui_table">
+				<thead>
+					<tr>
+						<th width="200px">人物照片</th>
+						<th>名字</th>	
+						<th>名字拼音</th>	
+						<th>性别</th>	
+						<th>职务</th>	
+						<th>操作</th>	
+					</tr>
+				</thead>
+				<tbody class="admin_ui_table_hoverEffect">
+					<tr v-for="(data,index) in usersDataSource_filter"  v-show="index >= (pageIndex-1)*10 && index < pageIndex*10" height="200px" style="border: 1px solid #ddd;">			
+						<td style="text-align: center; height: 200px;" :style="{backgroundImage: 'url('+baseUrl+data.img+')',backgroundSize:'contain',backgroundRepeat:'no-repeat',backgroundPosition:'center'}"></td>
+						<td>{{data.name}}</td>
+						<td>{{data.spell}}</td>
+						<td>{{data.appellation}}</td>
+						<td>{{data.main_title}}</td>
+						<td class="admin_ui_table_action">
+							<a :href="getUrl(data.id)" class="iconButton checkIcon">
+								<i class="fa fa-eye"></i>
+								修改
+							</a>
+							<div class="iconButton removeIcon" @click="deleteUserButton(index)">
+								<i class="fa fa-remove"></i>
+								删除
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			<div class="admin_ui_pagination">
+				<div class="M-box"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+var vm = new Tvm({
+	el: '#admin_content_innerBox',
+	data:{
+		keyword: "",
+		usersDataSource: [],
+		usersDataSource_filter:[],
+		dataSource_sub: [],
+		baseUrl: "http://chuangdao.moovi-tech.com",
+		pageIndex: 1
+	},
+	methods: {
+		search: function(){
+			var self = this;
+			self.usersDataSource_filter = [];
+			for(index in self.usersDataSource){
+				var _user = self.usersDataSource[index];
+				if(self.isContainKeyword([_user.name,_user.spell,_user.main_title,_user.sub_title,_user.description],self.keyword)){
+					self.usersDataSource_filter.push(_user);
+				}
+			}
+			self.refreshTable();
+		},
+		getUrl:function(val){
+			return '#/aboutcd_team_detail.html?id='+val;
+		},
+		isContainKeyword: function(arr,keyword){
+			for(index in arr){
+				if(typeof arr[index] == "undefined"){
+					arr[index]="";
+				}
+				if(typeof arr[index] != "string"){
+					arr[index] = arr[index]+"";
+				}
+				if(arr[index].search(keyword)>=0){
+					return true;
+				}
+			}
+			return false;
+		},
+		refreshTable: function(){
+			var self = this;
+			$('.M-box').pagination({
+				totalData: self.usersDataSource_filter.length,
+			    showData: 10,
+			    current: self.pageIndex,
+			    count: 3,
+			    jump: true,
+				coping: true,
+				prevContent:'<i class="fa fa-angle-left"></i>',		//上一页内容
+				nextContent:'<i class="fa fa-angle-right"></i>',		//下一页内容
+			    callback:function(index){
+			        self.pageIndex = index;
+			    }
+			});
+		},
+		deleteUserButton: function(index){
+			var self = this;
+			var msg = "真的要删除吗？"
+			if(confirm(msg)){
+				$.when(deleteTeam(self.usersDataSource_filter[index].id)).done(function(data){
+					alert("删除成功");
+					window.location.reload();
+				});
+			}
+			else{
+			}
+		},
+		getUrl:function(val){
+			return '#/aboutcd_team_detail.html?id='+val;
+		},
+	},
+	created: function(){
+		var self = this;
+		$.when(getTeam()).done(function(data){
+			if(data.list.length==0){
+				$(".admin_ui_pagination").css("display","none");
+			}
+			self.usersDataSource = data.list;	
+			self.usersDataSource_filter = self.usersDataSource;
+			for(var i = 0; i < self.usersDataSource.length; i++){
+				var sub_tmp = self.usersDataSource[i].sub_title;
+				for (var j = 0; j < sub_tmp.length; j++) {
+					if(j ==0){
+						if(sub_tmp.length>1)
+							self.dataSource_sub[i]= sub_tmp[j]+"/";
+						else
+							self.dataSource_sub[i]= sub_tmp[j]
+					}
+					else if(j==sub_tmp.length-1){
+						self.dataSource_sub[i]= self.dataSource_sub[i] + sub_tmp[j];
+					}
+					else{
+						self.dataSource_sub[i]= self.dataSource_sub[i] + sub_tmp[j]+"/";
+					}
+				}
+			}
+			self.refreshTable();
+		});
+	}
+});
+
+</script>

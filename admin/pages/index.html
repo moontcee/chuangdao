@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="author" content="chendind">
+    <meta name="reply-to" content="chendind@xiyoukeji.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" type="text/css" href="../source/plunges/fontAwesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../source/plunges/zTree/css/awesomeStyle/awesome.css">
+   
+
+    <!-- 后台基础css -->
+    <link rel="stylesheet" type="text/css" href="../source/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="../source/css/index.css">
+    
+    <!-- 库 或 框架 -->
+    <script src="../source/js/jquery-1.11.1.min.js"></script>
+    <script src="../source/js/vue.js"></script>
+
+    <!-- 基础ajax支持 -->
+    <script src="../source/js/ajax.js"></script>
+    <!-- vue扩展 -->
+    <script src="../source/js/vue_extend.js"></script>
+    <!-- 页面公共函数 -->
+    <script src="../source/js/public.js"></script>
+
+    <!-- 插件 -->
+    <script src="../source/plunges/tinymce/tinymce.js"></script>
+    <script src="../source/plunges/zTree/js/jquery.ztree.all.min.js"></script>
+    <script src="../source/plunges/ueditor/ueditor.config.js"></script>
+    <script src="../source/plunges/ueditor/ueditor.all.min.js"> </script>
+    <script src="../source/plunges/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+    <link rel="stylesheet" media="screen" type="text/css" href="../source/plunges/datepicker/css/datepicker.css" />
+    <script type="text/javascript" src="../source/plunges/datepicker/js/datepicker.js"></script>
+
+    <!-- 分页插件 -->
+    <script src="../source/js/jquery.pagination.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../source/css/pagination.css">
+</head>
+<body>
+    <div id="admin_body" class="admin_body">
+        <div id="admin_header" class="admin_header">
+            <div class="brand">
+            <div class="heart"><i class="fa fa-heart-o fa-lg"></i></div>
+            <span style="font-size:20px;margin-left:10px;">创道官网后台管理系统</span>
+        </div>
+        <div class="client" id="client">
+            <img style="margin-right: 10px;" src="../source/images/avatar.jpg" class="personimg">
+            <p style="position: absolute; top:0px;
+            display: inline-block;line-height: 40px;vertical-align; middle;">{{account_login}}</p>
+            <div class="xiala"><i class="fa fa-sort-desc" style="color:white"></i></div>
+        </div>
+        <div id="admin_ui_dropdown_menu" class="admin_ui_dropdown_menu" data-hideWhenBlur>
+            <a href="#/adminAccount.html">
+                <i class="fa fa-cogs"></i>&nbsp;账号管理
+            </a>
+        
+            <a class="loginOut"> <!-- href="sign_in.html" -->
+                <i class="fa fa-sign-out"></i>&nbsp;退出登录
+            </a>
+        </div>
+    </div>
+    <div id="admin_left" class="admin_left">
+        <div class="leftmenu">
+             <div class="menu_item">
+                <a href="#/img_management.html" class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-picture-o fa-lg"></i>
+                    </span>
+                    <div class="name">图片管理</div>
+                </a>
+            </div>
+            <div class="menu_item">
+                <a href="#/video_management.html" class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-file-video-o fa-lg"></i>
+                    </span>
+                    <div class="name">视频管理</div>
+                </a>
+            </div>
+            <div class="menu_item">
+                <a href="#/pdf_management.html" class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-file-pdf-o fa-lg"></i>
+                    </span>
+                    <div class="name">pdf管理</div>
+                </a>
+            </div>
+            <div class="menu_item">
+                <a class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-star-o fa-lg"></i>
+                    </span>
+                    <div class="name">首页管理</div>
+                    <span class="icon downIcon">
+                        <i class="fa fa-angle-down fa-lg"></i>
+                    </span>
+                    <span class="icon rightIcon">
+                        <i class="fa fa-angle-right fa-lg"></i>
+                    </span>
+                </a>
+                <div class="submenu">
+                    <a class="line" href="#/homepage_slideimg.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">轮播图管理</div>
+                    </a>
+                    <a class="line" href="#/homepage_img.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">首页图片管理</div>
+                    </a>
+                    <a class="line" href="#/homepage_video.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">首页视频</div>
+                    </a>
+                    <a class="line" href="#/homepage_article.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">首页文章</div>
+                    </a>
+                    <a class="line" href="#/homepage_articleblocks.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">文章方块管理</div>
+                    </a>
+
+                </div>
+            </div>
+            <div class="menu_item">
+                <a class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-moon-o fa-lg"></i>
+                    </span>
+                    <div class="name">关于创道</div>
+                    <span class="icon downIcon">
+                        <i class="fa fa-angle-down fa-lg"></i>
+                    </span>
+                    <span class="icon rightIcon">
+                        <i class="fa fa-angle-right fa-lg"></i>
+                    </span>
+                </a>
+                <div class="submenu">
+                    <a class="line" href="#/aboutcd_introduction.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">公司简介</div>
+                    </a>
+                    <a class="line" href="#/aboutcd_team.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">管理团队</div>
+                    </a>
+                    <a class="line" href="#/aboutcd_development.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">发展历程</div>
+                    </a>
+                    <a class="line" href="#/aboutcd_holdingcompany.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">控股企业</div>
+                    </a>
+                    <a class="line" href="#/aboutcd_credential.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">荣誉资质</div>
+                    </a>
+                    <a class="line" href="#/aboutcd_responsibility.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">社会责任</div>
+                    </a>
+                    <a class="line" href="#/aboutcd_partner.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">合作伙伴</div>
+                    </a>
+                    <a class="line" href="#/aboutcd_journal.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">企业内刊</div>
+                    </a>
+                </div>
+            </div>
+            <div class="menu_item">
+                <a class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-server fa-lg"></i>
+                    </span>
+                    <div class="name">产品与服务</div>
+                    <span class="icon downIcon">
+                        <i class="fa fa-angle-down fa-lg"></i>
+                    </span>
+                    <span class="icon rightIcon">
+                        <i class="fa fa-angle-right fa-lg"></i>
+                    </span>
+                </a>
+                <div class="submenu">
+                    <a class="line" href="#/product_proshow.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">项目展示</div>
+                    </a>
+                    <a class="line" href="#/product_prodynamic.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">项目动态</div>
+                    </a>
+                </div>
+            </div>
+            <div class="menu_item" id="search">
+                <a class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-line-chart fa-lg"></i>
+                    </span>
+                    <div class="name">创道研究</div>
+                    <span class="icon downIcon">
+                        <i class="fa fa-angle-down fa-lg"></i>
+                    </span>
+                    <span class="icon rightIcon">
+                        <i class="fa fa-angle-right fa-lg"></i>
+                    </span>
+                </a>
+                <div class="submenu">
+                    <a class="line" href="#/search_input.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">创道投研</div>
+                    </a>
+                    <a class="line" href="#/search_observe.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">每周观察</div>
+                    </a>
+                </div>    
+            </div>
+            <div class="menu_item">
+                <a class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-newspaper-o fa-lg"></i>
+                    </span>
+                    <div class="name">新闻中心</div>
+                    <span class="icon downIcon">
+                        <i class="fa fa-angle-down fa-lg"></i>
+                    </span>
+                    <span class="icon rightIcon">
+                        <i class="fa fa-angle-right fa-lg"></i>
+                    </span>
+                </a>
+                <div class="submenu">
+                    <a class="line" href="#/news_announcement.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">公司公告</div>
+                    </a>
+                    <a class="line" href="#/news_companynews.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">公司新闻</div>
+                    </a>
+                    <a class="line" href="#/news_industrynews.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">行业新闻</div>
+                    </a>
+                </div>
+            </div>
+            <div class="menu_item" id="recruit">
+                <a href="#/recruit.html" class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-user-circle fa-lg"></i>
+                    </span>
+                    <div class="name">招聘中心</div>
+                </a>
+            </div>        
+            <div class="menu_item">
+                <a class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-bell-o fa-lg"></i>
+                    </span>
+                    <div class="name">联系我们</div>
+                    <span class="icon downIcon">
+                        <i class="fa fa- fa-lg"></i>
+                    </span>
+                    <span class="icon rightIcon">
+                        <i class="fa fa-angle-right fa-lg"></i>
+                    </span>
+                </a>
+                <div class="submenu">
+                    <a class="line" href="#/contact_contactus_detail.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">联系创道</div>
+                    </a>
+                    <a class="line" href="#/contact_findus.html">
+                        <span class="icon markIcon">
+                            <i class="fa fa-lemon-o"></i>
+                        </span>
+                        <div class="name">找到我们</div>
+                    </a>
+                </div>    
+            </div>
+            <div class="menu_item">
+                <a href="#/admin_user.html" class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-circle-o-notch fa-lg"></i>
+                    </span>
+                    <div class="name">后台管理</div>
+                </a>
+            </div>  
+            <div class="menu_item">
+                <a href="#/other_link.html" class="line">
+                    <span class="icon markIcon">
+                        <i class="fa fa-paper-plane-o fa-lg"></i>
+                    </span>
+                    <div class="name">友情链接</div>
+                </a>
+            </div>  
+        </div>
+    </div>
+    <div id="admin_content" class="admin_content"></div>
+</div>
+</body>
+<script>
+    // var type_array=window.location.href;
+    // var type_get=type_array.split("=")[1];
+    var admin_type = window.localStorage;
+    var type_get = admin_type["type"];
+    console.log(type_get)
+    if(typeof(type_get)!="undefined"){
+        if(type_get==2){
+            $(".menu_item").css("display","none");
+            $("#recruit").css("display","block");
+        }
+        if(type_get==3){
+            $(".menu_item").css("display","none");
+            $("#search").css("display","block");
+        }
+    }
+    var vm = new Tvm({
+        el: '#client',
+        data:{
+            account_login:"",
+            baseUrl: "http://chuangdao.moovi-tech.com",
+        },
+        methods: {
+
+        },
+        created:function() {
+            var self = this;
+            $.when(isLogin()).done(function(data){
+                console.log(data)
+                if(data.state==0){
+                  self.account_login = data.name;
+                }
+                if(data.state==1){
+                    self.account_login = "未登录";
+                    //alert("用户未登录");
+                    //window.location.href="/admin_backup/pages/sign_in.html";
+                }
+            });
+
+        },
+        mounted:function(){
+            $(".loginOut").on("click",function(){
+                $.when(logout()).done(function(data){
+                    window.location.href="sign_in.html";
+                });
+            })
+        },
+    });
+    
+</script>
+</html>

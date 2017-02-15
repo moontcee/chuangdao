@@ -1,0 +1,121 @@
+<div class="admin_content_innerBox">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-cogs fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">账号管理</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<table class="admin_ui_leadForm">
+					<tbody>
+						<td class="admin_ui_leadForm_lead" style="width: 35%">
+							<h3>
+								<i class="fa fa-unlock-alt admin_ui_mainColor"></i>
+								账户与密码
+							</h3>
+							<p style="width: 100%;">
+								请在安全的网络中修改密码；切勿在网吧或他人电脑进行操作
+							</p>
+						</td>
+						<td>
+							<div class="admin_ui_form_field">
+								<div class="admin_ui_name">用户名</div>
+								<input class="admin_ui_input" type="text" disabled v-model="login_name"/>
+							</div>
+							<div class="admin_ui_form_field">
+								<div class="admin_ui_name">角色</div>
+								<input class="admin_ui_input" type="text" disabled v-model="login_type"/>
+							</div>								
+							<div class="admin_ui_separator"></div>
+							<div class="admin_ui_form_field">
+								<div class="admin_ui_name">原密码</div>
+								<input class="admin_ui_input" type="password" placeholder="请输入原密码" v-model="opassword"/>
+							</div>
+							<div class="admin_ui_form_field">
+								<div class="admin_ui_name">新密码</div>
+								<input class="admin_ui_input" type="password" placeholder="请输入新密码" v-model="npassword"/>
+							</div>
+							<div class="admin_ui_form_field">
+								<div class="admin_ui_name">确认新密码</div>
+								<input class="admin_ui_input" type="password" placeholder="请再次输入新密码" v-model="npassword_confirm"/>
+							</div>
+							<div class="admin_ui_button admin_ui_button_green" style="margin-top: 40px;" id="edit_password">
+								确定修改
+							</div>
+						</td>
+					</tbody>
+				</table>
+				<div class="admin_ui_separator"></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	var vm = new Tvm({
+		el: '.admin_ui_leadForm',
+		data:{
+			login_name:"",
+			login_type:"",
+			opassword:"",
+			npassword:"",
+			npassword_confirm:"",
+			baseUrl: "http://chuangdao.moovi-tech.com",
+		},
+		methods: {	
+
+		},
+		created:function() {
+			var self = this;
+			$.when(isLogin()).done(function(data){
+				if(data.state==1){
+					alert("用户未登录");
+					window.location.href="/admin_backup/pages/sign_in.html";
+				}
+				if(data.state==0){
+					self.login_name = data.name;
+					if(data.type==2){
+						self.login_type = "招聘管理员";
+					}
+					if(data.type==3){
+						self.login_type = "研究管理员";
+					}
+					if(data.type==0){
+						self.login_type = "总管理员";
+					}
+				}
+			});
+		},
+		mounted:function(){
+			var self = this;
+			$("#edit_password").on("click",function(){
+				if(self.npassword == self.npassword_confirm){
+					$.when(editPassword(self.opassword,self.npassword)).done(function(data){
+						if(data.state==0){
+							alert("修改成功")
+						}
+						else{
+							alert(data.detail);
+						}
+					});
+				}
+				else{
+					alert("确认密码不一致");
+				}
+			})
+	
+		},
+
+	});
+
+</script>
+
+
+
+
+
+
+
+
+
+
+

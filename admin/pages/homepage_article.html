@@ -1,0 +1,103 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">首页文章管理</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">标题</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入标题">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">摘要</div>
+					<textarea type="text" class="admin_ui_input" placeholder="请输入摘要" style="height: 100px"></textarea>
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">时间</div>
+					<input class="inputDate" id="inputDate" style="border: 1px solid #ddd; padding: 6px 4px; height: 30px;" type="text">
+				</div>
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">链接</div>
+					<input type="text" class="admin_ui_input" placeholder="请输入链接">
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+
+<script>
+var input_value;
+$(function(){
+	var date_now = new Date();
+	var year_now = date_now.getFullYear();
+	var month_now = date_now.getMonth()+1;
+	var day_now = date_now.getDate();
+	var date = month_now+"-"+day_now+"-"+year_now;
+	document.getElementById("inputDate").value = date;
+	$('#inputDate').DatePicker({
+		format:'m-d-Y',
+		date: '2008-07-31',
+		current: '2008-07-31',
+		calendars: 1,
+		starts: 1,	
+		onBeforeShow: function(){
+			$('#inputDate').DatePickerSetDate($('#inputDate').val(), true);
+		},
+		onChange: function(formated, dates){
+			$('#inputDate').val(formated);
+			if ($('#closeOnSelect input').attr('checked')){
+				$('#inputDate').DatePickerHide();
+			}
+			input_value = document.getElementById("inputDate").value;
+		}
+	});
+})
+
+var id_this,title,summary,time,url;
+var img,text;
+$.when(getHomeArticle()).done(function(data){	
+	id_this = data.id;
+	img = data.img[0];
+	text = data.text;
+	$(".admin_ui_input")[0].value = data.title;
+	$(".admin_ui_input")[1].value = data.summary;
+	$(".admin_ui_input")[2].value = data.url;	
+	year = stamp2time(data.time).split("-")[0];
+	month = stamp2time(data.time).split("-")[1];
+	day = stamp2time(data.time).split("-")[2];
+	var date_this = month+"-"+day+"-"+year;
+	document.getElementById("inputDate").value = date_this;
+});
+
+$(".admin_ui_button_green").on("click",function(){
+	title = $(".admin_ui_input")[0].value;
+	summary = $(".admin_ui_input")[1].value;
+	url = $(".admin_ui_input")[2].value;
+	date = document.getElementById("inputDate").value;
+	console.log(date)
+	year = date.split("-")[2];
+	month = date.split("-")[0];
+	day = date.split("-")[1];
+	var mydate = new Date();
+	mydate.setFullYear(year,month-1,day);
+
+	$.when(editArticle(id_this,mydate,title,summary,text,img,"HOME_ARTICLE",url)).done(function(data){
+		if(data.list.length==0){
+			$(".admin_ui_pagination").css("display","none");
+		}
+		if(data.state==0){
+			alert("修改成功");
+		}
+	});	
+})
+</script>

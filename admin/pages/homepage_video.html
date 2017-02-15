@@ -1,0 +1,112 @@
+<div class="admin_content_innerBox admin_ui_cont_bottomPadding">
+	<div class="admin_scrollBox">
+		<div class="admin_ui_header">
+			<i class="fa fa-edit fa-2x admin_ui_mainColor"></i>
+			<span class="maintitle">首页视频管理</span>
+		</div>
+		<div class="admin_ui_cont">
+			<div class="admin_ui_border admin_ui_cont">
+				<div class="admin_ui_form_field">
+					<div class="admin_ui_name">视频id<div class="image_select" style="display: inline-block; margin-left: 10px; margin-right: 10px;"><i class="fa fa-folder-open-o"></i></div></div>
+					<input type="text" class="admin_ui_input" placeholder="请输入视频id">
+				</div>
+				
+			</div>
+		</div>
+	</div>
+	<div class="image_blocks">
+		<p>当前选择视频链接：{{imgUrl}}</p>
+		<div v-for="(video,index) in imageList" class="image_toSelect">
+			<img :src="baseUrl+video.img" @click="getImgId(index)">
+		</div>
+	</div>
+
+	<div class="image_bottons">
+		<div class="admin_ui_button admin_ui_button_white_img image_cancel" data-urlBack>
+			取消
+		</div>
+		<div class="admin_ui_button admin_ui_button_green_img image_add">
+			添加
+		</div>
+	</div>
+</div>
+<div class="admin_ui_cont_bottomFixed">
+	<div class="admin_ui_button_group" style="float: right">
+		<div class="admin_ui_button admin_ui_button_green">
+			确定
+		</div>
+	</div>
+</div>
+
+<script>
+var url;
+ $.when(getHomeVideo()).done(function(data){	
+	if(data.id){
+ 		$(".admin_ui_input")[0].value = data.id;
+	}
+	else{
+		$(".admin_ui_input")[0].value = "资源不存在";
+	}
+});
+var edit = 1;
+$(".admin_ui_button_green").on("click",function(){
+	var id_this = $(".admin_ui_input")[0].value;
+	if(isNaN(parseInt(id_this))){
+			edit = 0;
+			alert("请输入视频id。格式应为数字。");
+		}
+	if(edit){
+		$.when(setHomeVideo(id_this)).done(function(data){
+			alert("修改成功");
+	  		window.location.reload(); 
+		});	
+	}
+})
+var vm = new Tvm({
+	el: '.image_blocks',
+	data:{
+		imageList:[],
+		baseUrl: "http://chuangdao.moovi-tech.com",
+		imgUrl:"",
+		imgId:"",
+	},
+	methods: {
+		getImgId:function(index){
+			var self = this;
+			$(".image_toSelect img").css("border","1px solid #ccc");
+			$(".image_toSelect img").eq(index).css("border","2px solid #f34541");
+			$.when(getVideo()).done(function(data){
+				self.imageList = data.list;
+				self.imgId = self.imageList[index].id;
+				self.imgUrl = self.imageList[index].url;
+			});
+			
+		}
+	},
+	created:function(){
+		var self = this;
+		$.when(getVideo()).done(function(data){
+			self.imageList=data.list;
+			
+		});
+	},
+	mounted:function(){
+		var self = this;
+		$(".admin_ui_button_green_img").on("click",function(){
+			$(".admin_ui_input")[0].value = self.imgId;
+			$(".image_blocks").hide();
+			$(".image_bottons").hide();
+		})
+	}
+});
+$(".image_select").on("click",function(){
+	$(".image_blocks").show();
+	$(".image_bottons").show();
+	
+})
+
+$(".admin_ui_button_white_img").on("click",function(){
+	$(".image_blocks").hide();
+	$(".image_bottons").hide();
+})
+</script>

@@ -1,0 +1,21 @@
+
+Tcl command:  project new (create a new ISE project)
+
+The project new command creates a new ISE project.
+
+Syntax:  % project new <project_name> 
+
+<project>  	is the name of the Xilinx Tcl command.
+<new> 	   	is the name of the project subcommand.
+<project_name>  specifies the name for the ISE project you wish to create. 
+		If a .ise extension is not specified, it is assumed.
+
+Example: 	% project new watchver.ise
+Description:	In this example, a new ISE project named watchver.ise is 
+		created in the current directory. 
+Tcl Return:	The name of the new ISE project.
+
+For more information on the project command, type:
+
+	% help project
+

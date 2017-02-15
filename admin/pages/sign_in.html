@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="../source/css/reset.css">
+    <link rel="stylesheet" type="text/css" href="../source/plunges/fontAwesome/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="../source/css/sign_in.css">
+    <script src="../source/js/jquery-1.11.1.min.js"></script>
+    <script src="../source/js/public.js"></script>
+    <script src="../source/js/vue.js"></script>
+    <script src="../source/js/vue_extend.js"></script>
+    <script src="../source/js/ajax.js"></script>
+</head>
+<body>
+	<div class="wrapper">
+		<div class="application">
+			<a href="sign_in.html"><div><img src="../source/images/WechatIMG2.png" style="height: 60px;"></div>
+			<span>创道资本后台管理系统</span></a>
+		</div>
+	</div>
+	<div class="controls" style="height:300px;">
+		<div class="caret"></div>
+		<div class="form-wrapper">
+			<h1>登录</h1>
+			<div class="gd">
+				<input v-model="name" type="text" class="denglu" placeholder="用户名" id="mail">
+				<i class="fa fa-user user" ></i>
+			</div>
+			<div class="gd">
+				<input v-model="password" type="password" class="denglu" placeholder="密码" id="pass">
+				<i class="fa fa-lock user" ></i>
+			</div>
+			
+			<a class="btn" style="cursor:pointer">登录</a>
+			
+		</div>
+	</div>
+</body>
+<script>
+	var vm = new Tvm({
+		el: '.form-wrapper',
+		data:{
+			name:"",
+			password:"",
+			baseUrl: "http://chuangdao.moovi-tech.com",
+		},
+		methods: {	
+
+		},
+		created:function() {
+
+		},
+		mounted:function(){
+			var self = this;
+			$(".btn").on("click",function(){
+				$.when(adminLogin(self.name,self.password)).done(function(data){
+					var admin_type = window.localStorage;
+					admin_type.setItem("type",data.type);
+					if(data.state==0){
+						//console.log(data)
+						if(data.type==2){
+							window.location.href="index.html#/recruit.html?type="+data.type; 
+						}
+						if(data.type==3){
+							window.location.href="index.html#/search_input.html?type="+data.type; 
+						}
+						if(data.type==0){
+							window.location.href="index.html"; 
+						}
+
+
+					}
+					else{
+						alert(data.detail);
+					}
+				});
+			})	
+		},
+	});
+
+
+
+</script>
+</html>
